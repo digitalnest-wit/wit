@@ -1,2 +1,3 @@
 # wit
-A CLI to assist with WIT-related actions
+
+A CLI tool to assist with tasks related to the Web and IT department at Digital NEST.

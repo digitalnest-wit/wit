@@ -17,6 +17,12 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+# Build files
+build/
+
+# Annoying macOS file
+.DS_Store
+
 # Go workspace file
 go.work
 go.work.sum
