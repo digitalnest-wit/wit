@@ -1,3 +1,5 @@
+// Package config provides functions for working with the config command
+// and managing configuration.
 package config
 
 import (
