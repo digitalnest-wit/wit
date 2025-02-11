@@ -3,7 +3,6 @@ package config
 import (
 	"bytes"
 	"encoding/json"
-	"strings"
 )
 
 // UnmarshalJSON provides a custom unmarshaling implementation for Config.
@@ -17,11 +16,11 @@ func (c *Config) UnmarshalJSON(data []byte) error {
 
 // MarshalJSON provides a custom marshaling implementation for Config.
 func (c Config) MarshalJSON() ([]byte, error) {
-	result := strings.Builder{}
-	encoder := json.NewEncoder(&result)
+	buffer := bytes.Buffer{}
+	encoder := json.NewEncoder(&buffer)
 	err := encoder.Encode(c.config)
 
-	return []byte(result.String()), err
+	return buffer.Bytes(), err
 }
 
 // Install everything defined in witconfig.json
