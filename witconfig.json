@@ -1,10 +1,14 @@
 {
   "version": "0.1",
-  "brew_install": {
-    "formulae": ["node@23"],
-    "casks": []
+  "brew": {
+    "formulae": [
+      "node@23"
+    ],
+    "casks": [
+      "docker"
+    ]
   },
-  "code_install": {
+  "code": {
     "extensions": [
       "1yib.rust-bundle",
       "alexti.intellij-idea-light-theme",

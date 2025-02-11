@@ -1,14 +1,27 @@
 package config
 
-type witConfig struct {
-	Version    string     `json:"version"`
-	BrewConfig brewConfig `json:"brew_install"`
-	CodeConfig codeConfig `json:"code_install"`
+import (
+	"bytes"
+	"encoding/json"
+	"strings"
+)
+
+// UnmarshalJSON provides a custom unmarshaling implementation for Config.
+func (c *Config) UnmarshalJSON(data []byte) error {
+	result := bytes.NewReader(data)
+	decoder := json.NewDecoder(result)
+	err := decoder.Decode(&c.config)
+
+	return err
 }
 
-// Config contains all the configuration data defined in witconfig.json
-type Config struct {
-	config witConfig
+// MarshalJSON provides a custom marshaling implementation for Config.
+func (c Config) MarshalJSON() ([]byte, error) {
+	result := strings.Builder{}
+	encoder := json.NewEncoder(&result)
+	err := encoder.Encode(c.config)
+
+	return []byte(result.String()), err
 }
 
 // Install everything defined in witconfig.json

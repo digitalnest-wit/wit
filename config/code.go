@@ -4,15 +4,18 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"time"
+
+	"github.com/briandowns/spinner"
 )
 
-type codeConfig struct {
-	Extensions []string `json:"extensions"`
-}
-
 func (cfg codeConfig) Install() error {
+	loadingIndicator := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+	defer loadingIndicator.Stop()
+
 	if _, err := exec.LookPath("code"); err != nil {
-		fmt.Println("code not installed. installing code via brew..")
+		loadingIndicator.Suffix = "  code not installed. installing code via brew..."
+		loadingIndicator.Start()
 
 		cmd := exec.Command("brew", "install", "code")
 		_, err := cmd.Output()
@@ -20,8 +23,12 @@ func (cfg codeConfig) Install() error {
 			return fmt.Errorf("brew: failed to install code")
 		}
 
-		fmt.Println("done, code installed.")
+		loadingIndicator.Stop()
+		fmt.Println("code: done, installed.")
 	}
+
+	loadingIndicator.Suffix = "  code: fetching extensions..."
+	loadingIndicator.Restart()
 
 	cmd := exec.Command("code", "--list-extensions")
 	extensions, err := cmd.Output()
@@ -29,7 +36,9 @@ func (cfg codeConfig) Install() error {
 		return fmt.Errorf("code: failed to list extensions")
 	}
 
-	fmt.Println("code: installing extensions..")
+	loadingIndicator.Suffix = "  code: installing extensions..."
+	loadingIndicator.Restart()
+
 	for _, extension := range cfg.Extensions {
 		if bytes.Contains(extensions, []byte(extension)) {
 			continue
@@ -41,7 +50,9 @@ func (cfg codeConfig) Install() error {
 			return fmt.Errorf("code: failed to install extension %q\n", extension)
 		}
 	}
-	fmt.Println("code: done, extensions installed")
+
+	loadingIndicator.Stop()
+	fmt.Println("code: done, all extensions installed")
 
 	return nil
 }
