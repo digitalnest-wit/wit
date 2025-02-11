@@ -23,7 +23,7 @@ func (c Config) MarshalJSON() ([]byte, error) {
 	return buffer.Bytes(), err
 }
 
-// Install everything defined in witconfig.json
+// Install everything defined in the configuration file.
 func (c Config) Install() error {
 	if err := c.config.BrewConfig.Install(); err != nil {
 		return err
@@ -36,7 +36,7 @@ func (c Config) Install() error {
 	return nil
 }
 
-// Version returns the version of the witconfig.json file
+// Version returns the version of the witconfig.json file.
 func (c Config) Version() string {
 	return c.config.Version
 }

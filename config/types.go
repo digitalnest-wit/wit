@@ -5,6 +5,7 @@ type Config struct {
 	config witConfig
 }
 
+// Installer is an interface that exposes a basic Install function.
 type Installer interface {
 	Install() error
 }
