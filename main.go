@@ -4,17 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"runtime"
 
 	"github.com/digitalnest-wit/wit/commands"
 )
 
 func main() {
-	if runtime.GOOS != "darwin" {
-		fmt.Println("error: unexpected runtime operating system")
-		os.Exit(1)
-	}
-
 	flag.Parse()
 	commandName := flag.Arg(0)
 
