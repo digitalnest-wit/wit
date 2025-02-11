@@ -31,7 +31,7 @@ func (cfg codeConfig) Install() error {
 	loadingIndicator.Restart()
 
 	cmd := exec.Command("code", "--list-extensions")
-	extensions, err := cmd.Output()
+	extensionsAlreadyInstalled, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("code: failed to list extensions")
 	}
@@ -40,7 +40,7 @@ func (cfg codeConfig) Install() error {
 	loadingIndicator.Restart()
 
 	for _, extension := range cfg.Extensions {
-		if bytes.Contains(extensions, []byte(extension)) {
+		if bytes.Contains(extensionsAlreadyInstalled, []byte(extension)) {
 			continue
 		}
 

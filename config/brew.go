@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -14,20 +15,29 @@ func (cfg brewConfig) Install() error {
 		return fmt.Errorf("brew not installed. install brew here (https://brew.sh) and try again.")
 	}
 
+	// Disable Homebrew's auto update feature (on by default)
+	if err := os.Setenv("HOMEBREW_NO_AUTO_UPDATE", "1"); err != nil {
+		return fmt.Errorf("brew: failed to disable auto-update")
+	}
+
 	loadingIndicator := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
-	loadingIndicator.Suffix = "  brew: installing casks..."
+	loadingIndicator.Suffix = "  brew: fetching casks..."
 	loadingIndicator.Start()
 
 	defer loadingIndicator.Stop()
 
-	for _, cask := range cfg.Casks {
-		// Ignore the "code" cask since we are already checking for it in CodeConfig.Install
-		if cask == "code" {
-			continue
-		}
+	cmd := exec.Command("brew", "list", "-1", "--cask")
+	casksAlreadyInstalled, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("brew: failed to list casks")
+	}
 
-		if err := os.Setenv("HOMEBREW_NO_AUTO_UPDATE", "1"); err != nil {
-			return fmt.Errorf("brew: failed to disable auto-update")
+	loadingIndicator.Suffix = "  brew: installing casks..."
+	loadingIndicator.Restart()
+
+	for _, cask := range cfg.Casks {
+		if cask == "code" || bytes.Contains(casksAlreadyInstalled, []byte(cask)) {
+			continue
 		}
 
 		cmd := exec.Command("brew", "install", "--cask", cask)
@@ -37,10 +47,23 @@ func (cfg brewConfig) Install() error {
 		}
 	}
 
+	loadingIndicator.Suffix = "  brew: fetching formulae..."
+	loadingIndicator.Restart()
+
+	cmd = exec.Command("brew", "list", "-1", "--formulae")
+	formulaeAlreadyInstalled, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("brew: failed to list formulae")
+	}
+
 	loadingIndicator.Suffix = "  brew: installing formulae.."
 	loadingIndicator.Restart()
 
 	for _, formula := range cfg.Formulae {
+		if bytes.Contains(formulaeAlreadyInstalled, []byte(formula)) {
+			continue
+		}
+
 		cmd := exec.Command("brew", "install", formula)
 		_, err := cmd.Output()
 		if err != nil {

@@ -2,7 +2,7 @@
   "version": "0.1",
   "brew": {
     "formulae": [
-      "node@23"
+      "node"
     ],
     "casks": [
       "warp"
