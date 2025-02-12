@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -33,11 +34,27 @@ func (cfg brewConfig) Install() error {
 	}
 
 	loadingIndicator.Suffix = "  brew: installing casks..."
-	loadingIndicator.Restart()
+	loadingIndicator.Stop()
 
 	for _, cask := range cfg.Casks {
+		// Skip the cask installation if it's "code" or was already installed via
+		// Homebrew.
 		if cask == "code" || bytes.Contains(casksAlreadyInstalled, []byte(cask)) {
 			continue
+		}
+
+		if runtime.GOOS == "darwin" {
+			spotlightSearchForCaskCmd := fmt.Sprintf("mdfind \"kMDItemKind == 'Application'\" | grep -i \"%s\"", cask)
+			cmd := exec.Command("bash", "-c", spotlightSearchForCaskCmd)
+			spotlightResult, err := cmd.Output()
+			if err != nil {
+				return fmt.Errorf("brew: failed to check for application %q: %w", cask, err)
+			}
+			// Skip the cask if an application already exists on the system with the
+			// same name as the cask
+			if len(bytes.TrimSpace(spotlightResult)) != 0 {
+				continue
+			}
 		}
 
 		cmd := exec.Command("brew", "install", "--cask", cask)
