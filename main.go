@@ -13,7 +13,16 @@ func main() {
 	commandName := flag.Arg(0)
 
 	if len(flag.Args()) < 1 {
-		fmt.Print("wit is a tool used for managing computers at Digital NEST.\n\n")
+		fmt.Println("          _  __ ")
+		fmt.Println(" _    __ (_)/ /_")
+		fmt.Println("| |/|/ // // __/")
+		fmt.Println("|__,__//_/ \\__/ ")
+		fmt.Println()
+		fmt.Print("A powerful command-line interface (CLI) tool designed ")
+		fmt.Print("specifically for Digital NEST to streamline and automate common ")
+		fmt.Print("computer operations.\n\nThis utility aims to simplify IT ")
+		fmt.Print("management and enhance productivity for the organization's ")
+		fmt.Print("technical staff.\n\n")
 		fmt.Print("Usage:\n    wit <command> [arguments]\n\n")
 		commands.PrintAvailable()
 
