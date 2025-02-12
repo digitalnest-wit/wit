@@ -52,7 +52,7 @@ var (
 
 				return nil
 			},
-			ShowHelp: func() {
+			PrintHelp: func() {
 				fmt.Print("config\n\nexecutes commands defined in the .witconfig ")
 				fmt.Print("file.\n\nIf a path argument is supplied, then the program ")
 				fmt.Print(" looks for the configuration file there. Otherwise the ")
@@ -71,7 +71,7 @@ var (
 				// all available commands. This function should never be called.
 				return nil
 			},
-			ShowHelp: func() {
+			PrintHelp: func() {
 				// Intentionally unimplemented. This function should never be called.
 			},
 		},

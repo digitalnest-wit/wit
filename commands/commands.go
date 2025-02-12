@@ -14,43 +14,43 @@ import (
 type Command struct {
 	Name        string
 	Description string
-	// Run runs the command, returning any errors if any.
-	Run func() error
-	// ShowHelp prints a help message for the command.
-	ShowHelp func()
+	Run         func() error
+	PrintHelp   func()
 }
 
-// ShowHelp prints the usage of the help command.
-func ShowHelp() {
+// PrintHelp prints the usage of the help command and calls the PrintHelp
+// method for the command received via command line arguments.
+func PrintHelp() {
 	commandName := flag.Arg(1)
 
 	if len(flag.Args()) < 2 || commandName == "help" {
 		fmt.Print("help\n\nprovides detailed help for a specified command.\n\n")
 		fmt.Println("Usage:\n    wit help <command>")
 		fmt.Println()
-		ShowAllCommands()
+		PrintAvailable()
 
 		return
 	}
 
 	command, isValidCommand := Available[commandName]
 	if !isValidCommand {
-		UnknownCommand(commandName)
+		HandleUnknownCmd(commandName)
 		os.Exit(1)
 	}
 
-	command.ShowHelp()
+	command.PrintHelp()
 }
 
-// UnknownCommand prints a message to the user notifying them that the command
-// received was unrecognized and invalid. A call to UnknownCommand will never
-// panic.
-func UnknownCommand(cmd string) {
+// HandleUnknownCmd prints a message notifying the user that the command
+// received was unrecognized. The program will exit with a status code
+// of 1.
+func HandleUnknownCmd(cmd string) {
 	fmt.Printf("Unrecognized command received: %q.\n", cmd)
+	os.Exit(1)
 }
 
-// ShowAllCommands prints a list of all the available commands.
-func ShowAllCommands() {
+// PrintAvailable prints a list of all the available commands.
+func PrintAvailable() {
 	fmt.Println("The commands are:")
 	fmt.Println()
 
