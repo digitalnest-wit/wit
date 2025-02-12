@@ -14,7 +14,7 @@ import (
 var (
 	// filePathNameRegex is a regular expression for validating configuration file
 	// names.
-	filePathNameRegex = regexp.MustCompile(".*\\.witconfig.json")
+	filePathNameRegex = regexp.MustCompile(".*\\.?witconfig.json")
 
 	// Available is a collection of wit commands. Entries are a command name
 	// mapping to a Command.
