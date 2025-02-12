@@ -14,33 +14,33 @@ import (
 
 func (cfg brewConfig) Install() error {
 	if _, err := exec.LookPath("brew"); err != nil {
-		return fmt.Errorf("brew not installed. install brew here (https://brew.sh) and try again.")
+		return fmt.Errorf("Homebrew not installed. Install it here (https://brew.sh) and try again")
 	}
 
 	// Disable Homebrew's auto update feature (on by default)
 	if err := os.Setenv("HOMEBREW_NO_AUTO_UPDATE", "1"); err != nil {
-		return fmt.Errorf("brew: failed to disable auto-update")
+		return fmt.Errorf("Failed to disable Homebrew auto-update")
 	}
 
 	loadingIndicator := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
-	loadingIndicator.Suffix = "  brew: fetching casks..."
-	loadingIndicator.Start()
-
 	defer loadingIndicator.Stop()
+
+	loadingIndicator.Suffix = "  Fetching casks..."
+	loadingIndicator.Start()
 
 	cmd := exec.Command("brew", "list", "-1", "--cask")
 	casksAlreadyInstalled, err := cmd.Output()
 	if err != nil {
-		return fmt.Errorf("brew: failed to list casks")
+		return fmt.Errorf("Failed to list casks")
 	}
 
-	loadingIndicator.Suffix = "  brew: installing casks..."
+	loadingIndicator.Suffix = "  Installing casks..."
 	loadingIndicator.Restart()
 
 	for _, cask := range cfg.Casks {
-		// Skip the cask installation if it's "code" or was already installed via
-		// Homebrew.
-		if cask == "code" || bytes.Contains(casksAlreadyInstalled, []byte(cask)) {
+		// Skip the cask installation if it's "visual-studio-code" or was already
+		// installed via Homebrew.
+		if cask == "visual-studio-code" || bytes.Contains(casksAlreadyInstalled, []byte(cask)) {
 			continue
 		}
 
@@ -58,26 +58,26 @@ func (cfg brewConfig) Install() error {
 			}
 		}
 
-		loadingIndicator.Suffix = fmt.Sprintf("  brew: installing %q...", cask)
+		loadingIndicator.Suffix = fmt.Sprintf("  Installing cask %q...", cask)
 		loadingIndicator.Restart()
 
 		cmd := exec.Command("brew", "install", "--cask", cask)
 		_, err := cmd.Output()
 		if err != nil {
-			return fmt.Errorf("brew: failed to install cask %q", cask)
+			return fmt.Errorf("Failed to install cask %q", cask)
 		}
 	}
 
-	loadingIndicator.Suffix = "  brew: fetching formulae..."
+	loadingIndicator.Suffix = "  Fetching formulae..."
 	loadingIndicator.Restart()
 
 	cmd = exec.Command("brew", "list", "-1", "--formulae")
 	formulaeAlreadyInstalled, err := cmd.Output()
 	if err != nil {
-		return fmt.Errorf("brew: failed to list formulae")
+		return fmt.Errorf("Failed to list formulae")
 	}
 
-	loadingIndicator.Suffix = "  brew: installing formulae.."
+	loadingIndicator.Suffix = "  Installing formulae..."
 	loadingIndicator.Restart()
 
 	for _, formula := range cfg.Formulae {
@@ -85,15 +85,18 @@ func (cfg brewConfig) Install() error {
 			continue
 		}
 
+		loadingIndicator.Suffix = fmt.Sprintf("  Installing formula %q...", formula)
+		loadingIndicator.Restart()
+
 		cmd := exec.Command("brew", "install", formula)
 		_, err := cmd.Output()
 		if err != nil {
-			return fmt.Errorf("brew: failed to install formula %q", formula)
+			return fmt.Errorf("Failed to install Homebrew formula %q", formula)
 		}
 	}
 
 	loadingIndicator.Stop()
-	fmt.Println("brew: done, all casks and formulae installed")
+	fmt.Println("All casks and formulae installed.")
 
 	return nil
 }

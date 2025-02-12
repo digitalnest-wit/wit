@@ -5,7 +5,6 @@ brew:
   casks:
     - warp
     - visual-studio-code
-    - firefox
 code:
   extensions:
     - bmewburn.vscode-intelephense-client

@@ -13,30 +13,49 @@ func (cfg codeConfig) Install() error {
 	loadingIndicator := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 	defer loadingIndicator.Stop()
 
+	loadingIndicator.Suffix = "  Checking for Visual Studio Code..."
+	loadingIndicator.Start()
+
 	if _, err := exec.LookPath("code"); err != nil {
-		loadingIndicator.Suffix = "  code not installed. installing code via brew..."
-		loadingIndicator.Start()
+		// Check if Visual Studio Code is installed first
+		spotlightSearchForAppCmd := fmt.Sprintf("mdfind \"kMDItemKind == 'Application'\" | grep -i \"visual studio code\"")
+		cmd := exec.Command("bash", "-c", spotlightSearchForAppCmd)
+		spotlightResult, _ := cmd.Output()
 
-		cmd := exec.Command("brew", "install", "code")
-		_, err := cmd.Output()
-		if err != nil {
-			return fmt.Errorf("brew: failed to install code")
+		// An empty result means Visual Studio Code is not listed as an application
+		if len(bytes.TrimSpace(spotlightResult)) == 0 {
+			loadingIndicator.Suffix = "  Installing Visual Studio Code via Homebrew..."
+			loadingIndicator.Restart()
+
+			cmd := exec.Command("brew", "install", "--cask", "visual-studio-code")
+			_, err := cmd.Output()
+			if err != nil {
+				return fmt.Errorf("Failed to install Visual Studio Code")
+			}
+		} else {
+			// A non-empty result means Visual Studio Code is installed but the code
+			// command is not added to the PATH
+			loadingIndicator.Suffix = "  Adding code command to PATH..."
+			loadingIndicator.Restart()
+
+			cmd := exec.Command("ln", "-s", "\"/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code\"", "/usr/local/bin/code")
+			_, err := cmd.Output()
+			if err != nil {
+				return fmt.Errorf("Failed to add code binary to PATH")
+			}
 		}
-
-		loadingIndicator.Stop()
-		fmt.Println("code: done, installed.")
 	}
 
-	loadingIndicator.Suffix = "  code: fetching extensions..."
+	loadingIndicator.Suffix = "  Fetching extensions..."
 	loadingIndicator.Restart()
 
 	cmd := exec.Command("code", "--list-extensions")
 	extensionsAlreadyInstalled, err := cmd.Output()
 	if err != nil {
-		return fmt.Errorf("code: failed to list extensions")
+		return fmt.Errorf("Failed to list extensions")
 	}
 
-	loadingIndicator.Suffix = "  code: installing extensions..."
+	loadingIndicator.Suffix = "  Installing extensions..."
 	loadingIndicator.Restart()
 
 	for _, extension := range cfg.Extensions {
@@ -44,15 +63,18 @@ func (cfg codeConfig) Install() error {
 			continue
 		}
 
+		loadingIndicator.Suffix = fmt.Sprintf("  Installing extension %q...", extension)
+		loadingIndicator.Restart()
+
 		cmd := exec.Command("code", "--install-extension", extension)
 		_, err := cmd.Output()
 		if err != nil {
-			return fmt.Errorf("code: failed to install extension %q\n", extension)
+			return fmt.Errorf("Failed to install extension %q\n", extension)
 		}
 	}
 
 	loadingIndicator.Stop()
-	fmt.Println("code: done, all extensions installed")
+	fmt.Println("All extensions installed.")
 
 	return nil
 }
