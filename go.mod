@@ -2,7 +2,10 @@ module github.com/digitalnest-wit/wit
 
 go 1.23.1
 
-require github.com/briandowns/spinner v1.23.2
+require (
+	github.com/briandowns/spinner v1.23.2
+	gopkg.in/yaml.v3 v3.0.1
+)
 
 require (
 	github.com/fatih/color v1.7.0 // indirect

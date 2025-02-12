@@ -1,0 +1,31 @@
+version: 0.2
+brew:
+  formulae:
+    - node
+  casks:
+    - warp
+    - visual-studio-code
+    - firefox
+code:
+  extensions:
+    - bmewburn.vscode-intelephense-client
+    - brapifra.phpserver
+    - davidanson.vscode-markdownlint
+    - devsense.composer-php-vscode
+    - devsense.intelli-php-vscode
+    - devsense.phptools-vscode
+    - devsense.profiler-php-vscode
+    - ecmel.vscode-html-css
+    - esbenp.prettier-vscode
+    - fill-labs.dependi
+    - ms-azuretools.vscode-docker
+    - neilbrayfield.php-docblocker
+    - ritwickdey.liveserver
+    - tamasfe.even-better-toml
+    - thealiahad.li
+    - wayou.vscode-todo-highlight
+    - xabikos.javascriptsnippets
+    - xdebug.php-debug
+    - xdebug.php-pack
+    - yzhang.markdown-all-in-one
+    - zobo.php-intellisens
