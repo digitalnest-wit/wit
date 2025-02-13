@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"runtime"
 	"strings"
 	"time"
 
@@ -44,24 +43,22 @@ func (cfg brewConfig) Install() error {
 			continue
 		}
 
-		if runtime.GOOS == "darwin" {
-			applicationName := strings.ReplaceAll(cask, "-", " ")
-			spotlightSearchForAppCmd := fmt.Sprintf("mdfind \"kMDItemKind == 'Application'\" | grep -i \"%s\"", applicationName)
+		applicationName := strings.ReplaceAll(cask, "-", " ")
+		spotlightSearchForAppCmd := fmt.Sprintf("mdfind \"kMDItemKind == 'Application'\" | grep -i \"%s\"", applicationName)
 
-			cmd := exec.Command("bash", "-c", spotlightSearchForAppCmd)
-			spotlightResult, _ := cmd.Output()
+		cmd := exec.Command("bash", "-c", spotlightSearchForAppCmd)
+		spotlightResult, _ := cmd.Output()
 
-			// Skip the cask if an application already exists on the system with the
-			// same name as the cask
-			if len(bytes.TrimSpace(spotlightResult)) != 0 {
-				continue
-			}
+		// Skip the cask if an application already exists on the system with the
+		// same name as the cask
+		if len(bytes.TrimSpace(spotlightResult)) != 0 {
+			continue
 		}
 
 		loadingIndicator.Suffix = fmt.Sprintf("  Installing cask %q...", cask)
 		loadingIndicator.Restart()
 
-		cmd := exec.Command("brew", "install", "--cask", cask)
+		cmd = exec.Command("brew", "install", "--cask", cask)
 		_, err := cmd.Output()
 		if err != nil {
 			return fmt.Errorf("Failed to install cask %q", cask)
