@@ -4,11 +4,17 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/digitalnest-wit/wit/commands"
 )
 
 func main() {
+	if runtime.GOOS != "darwin" {
+		fmt.Println("Unexpected operating system. Sorry, wit is a macOS specific tool.")
+		os.Exit(1)
+	}
+
 	flag.Parse()
 	commandName := flag.Arg(0)
 
